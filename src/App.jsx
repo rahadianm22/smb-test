@@ -3,14 +3,16 @@ import Prototipe from './pages/Prototipe.jsx';
 import Percakapan from './pages/Percakapan.jsx';
 import Alur from './pages/Alur.jsx';
 import Bahasa from './pages/Bahasa.jsx';
+import Latar from './pages/Latar.jsx';
 
-// Router hash sederhana (#whatsapp, #alur, #bahasa): tidak perlu rewrite di Vercel,
+// Router hash sederhana (#whatsapp, #alur, #bahasa, #latar): tidak perlu rewrite di Vercel,
 // refresh di halaman mana pun tetap jalan, dan aman dipakai di pratinjau artifact.
 const ROUTES = [
   { path: '', label: 'Prototipe', title: 'Prototipe', Page: Prototipe },
   { path: 'whatsapp', label: 'WhatsApp', title: 'Percakapan WhatsApp', Page: Percakapan },
   { path: 'alur', label: 'Alur', title: 'Alur utama', Page: Alur },
-  { path: 'bahasa', label: 'Bahasa', title: 'Bahasa Baik vs Kurang', Page: Bahasa }
+  { path: 'bahasa', label: 'Bahasa', title: 'Bahasa Baik vs Kurang', Page: Bahasa },
+  { path: 'latar', label: 'Latar', title: 'Latar tes', Page: Latar }
 ];
 
 function currentPath() {

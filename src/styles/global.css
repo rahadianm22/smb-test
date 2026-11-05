@@ -361,3 +361,21 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .phone .check { font-size: 17px; min-height: 44px; }
 .phone .split small { font-size: 14px; }
 .phone .report-card b { font-size: 18px; }
+
+/* Halaman Latar tes */
+.case { max-width: 720px; display: flex; flex-direction: column; gap: 14px; padding: 24px 0; }
+.case + .case { border-top: 1px solid var(--border-subtle); }
+.case--tint { background: var(--bg-brand-subtle); padding: 24px; border-radius: var(--r-24); border-top: none; margin: 8px 0; }
+.case h2 { font-size: 24px; line-height: 32px; }
+.case h3 { font-size: 19px; line-height: 28px; margin-top: 10px; }
+.case p, .case li, .case dd { font-size: 16px; line-height: 26px; }
+.case__lead { font-size: 18px; line-height: 28px; font-weight: 600; }
+.case__callout { padding: 14px 16px; border-radius: var(--r-12); background: var(--bg-brand-subtle); font-weight: 600; }
+.case__list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.case__finds { margin: 0; display: grid; gap: 10px; }
+.case__finds > div { padding: 12px 16px; border-radius: var(--r-12); background: var(--bg-surface); border: 1px solid var(--border-default); }
+.case__finds dt { font-weight: 700; }
+.case__finds dd { margin: 2px 0 0; color: var(--text-secondary); }
+.case__steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 14px; }
+.case__steps li b { display: block; }
+.case__steps li span { color: var(--text-secondary); }
