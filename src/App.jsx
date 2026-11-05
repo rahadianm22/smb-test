@@ -4,18 +4,19 @@ import Percakapan from './pages/Percakapan.jsx';
 import Alur from './pages/Alur.jsx';
 import Bahasa from './pages/Bahasa.jsx';
 
-// Router hash sederhana: tidak perlu konfigurasi rewrite di Vercel,
-// dan refresh di halaman mana pun tetap jalan.
+// Router hash sederhana (#whatsapp, #alur, #bahasa): tidak perlu rewrite di Vercel,
+// refresh di halaman mana pun tetap jalan, dan aman dipakai di pratinjau artifact.
 const ROUTES = [
-  { path: '/', label: 'Prototipe', title: 'Prototipe', Page: Prototipe },
-  { path: '/whatsapp', label: 'WhatsApp', title: 'Percakapan WhatsApp', Page: Percakapan },
-  { path: '/alur', label: 'Alur', title: 'Alur utama', Page: Alur },
-  { path: '/bahasa', label: 'Bahasa', title: 'Bahasa Baik vs Kurang', Page: Bahasa }
+  { path: '', label: 'Prototipe', title: 'Prototipe', Page: Prototipe },
+  { path: 'whatsapp', label: 'WhatsApp', title: 'Percakapan WhatsApp', Page: Percakapan },
+  { path: 'alur', label: 'Alur', title: 'Alur utama', Page: Alur },
+  { path: 'bahasa', label: 'Bahasa', title: 'Bahasa Baik vs Kurang', Page: Bahasa }
 ];
 
 function currentPath() {
-  const p = window.location.hash.replace(/^#/, '') || '/';
-  return ROUTES.some((r) => r.path === p) ? p : '/';
+  // Alamat lama #/whatsapp tetap dikenali.
+  const p = window.location.hash.replace(/^#\/?/, '');
+  return ROUTES.some((r) => r.path === p) ? p : '';
 }
 
 export default function App() {
@@ -41,7 +42,7 @@ export default function App() {
     <>
       <header className="site-header">
         <div className="site-header__inner">
-          <a className="brand" href="#/">
+          <a className="brand" href="#">
             <b>Sejati SMB</b>
             <span>Tes UI/UX · prototipe</span>
           </a>

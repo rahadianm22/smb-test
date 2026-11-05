@@ -4,10 +4,10 @@ Prototipe tes UI/UX Sejati SMB, dibuat dengan Vite dan React memakai token Natun
 
 | Halaman | Isi |
 |---|---|
-| `#/` Prototipe | Dua HP yang saling terhubung: Rina di WhatsApp dan Bu Sari di aplikasi Sejati. Ikuti petunjuk 1 sampai 6. |
-| `#/whatsapp` | 9 potongan percakapan pembeli, ditambah perbandingan dengan contoh bot |
-| `#/alur` | Alur utama: siapa melakukan apa, dan di mana |
-| `#/bahasa` | Tabel bahasa Baik vs Kurang |
+| `#` Prototipe | Dua HP yang saling terhubung: Rina di WhatsApp dan Bu Sari di aplikasi Sejati. Ikuti petunjuk 1 sampai 6. |
+| `#whatsapp` | 9 potongan percakapan pembeli, ditambah perbandingan dengan contoh bot |
+| `#alur` | Alur utama: siapa melakukan apa, dan di mana |
+| `#bahasa` | Tabel bahasa Baik vs Kurang |
 
 Aturan produk yang dijaga: **Asisten AI tidak menagih dan tidak mengonfirmasi pembayaran.** Penagihan dan cek uang masuk selalu dilakukan Bu Sari.
 
@@ -42,7 +42,7 @@ Buat repo kosong di GitHub dulu (tanpa README) supaya `git push` tidak bentrok.
 3. Vercel mengenali Vite sendiri. Biarkan pengaturan bawaan: build `npm run build`, output `dist`.
 4. Tekan **Deploy**. Setiap `git push` ke `main` akan memperbarui situs secara otomatis.
 
-Tidak perlu `vercel.json`. Halaman memakai alamat `#/...`, jadi refresh di halaman mana pun tetap jalan.
+Tidak perlu `vercel.json`. Halaman memakai alamat `#...`, jadi refresh di halaman mana pun tetap jalan.
 
 ## Struktur
 
