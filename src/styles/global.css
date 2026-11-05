@@ -338,3 +338,26 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .split small { font-size: 12px; line-height: 16px; color: var(--text-secondary); }
 .unpaid .items { margin-top: 8px; }
 .unpaid .items__row span { font-weight: 500; color: var(--text-primary); }
+
+/* Status pesanan */
+.status-title { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; color: var(--success-text); }
+.track { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.track li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; line-height: 16px; color: var(--text-secondary); text-align: center; }
+.track li::before { content: ''; position: absolute; top: 11px; right: 50%; width: 100%; height: 2px; background: var(--border-default); }
+.track li:first-child::before { display: none; }
+.track li.is-done::before { background: var(--success-fill); }
+.track__dot { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); border: 2px solid var(--border-default); display: flex; align-items: center; justify-content: center; }
+.track li.is-done { color: var(--text-primary); font-weight: 600; }
+.track li.is-done .track__dot { background: var(--success-fill); border-color: var(--success-fill); }
+.track li.is-now .track__dot { border-color: var(--bg-brand); }
+
+/* Untuk pemilik yang tidak biasa memakai aplikasi: huruf lebih besar, tombol lebih tinggi */
+.phone .app-screen, .phone .chat { font-size: 17px; line-height: 26px; }
+.phone .ai-card p, .phone .info, .phone .warn { font-size: 17px; line-height: 26px; }
+.phone .note { font-size: 16px; line-height: 24px; }
+.phone .btn--block { min-height: 56px; font-size: 17px; }
+.phone .chips .btn { min-height: 48px; font-size: 16px; }
+.phone .items__row { font-size: 17px; line-height: 26px; }
+.phone .check { font-size: 17px; min-height: 44px; }
+.phone .split small { font-size: 14px; }
+.phone .report-card b { font-size: 18px; }

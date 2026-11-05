@@ -21,7 +21,7 @@ const REMINDER = 'Halo Kak Rina, transfernya belum masuk di rekening kami. Boleh
 const initial = {
   step: 0, screen: 'beranda', typing: false, a: false, b: false, draft: false, reminded: false, snack: false,
   extra: [], pendingAi: null, rinaNote: null, compose: null, notes: [],
-  method: null, qrisPaying: false
+  method: null, qrisPaying: false, ord: 0
 };
 
 // Balasan cepat Rina setelah menerima pengingat dari Bu Sari.
@@ -34,7 +34,7 @@ function reducer(s, act) {
     case 'screen': return { ...s, screen: act.screen, step: act.screen === 'laporan' && s.step === 5 ? 6 : s.step };
     case 'sendTotal': return { ...s, step: 2 };
     case 'sendProof': return { ...s, step: 3, method: 'manual', typing: true, a: false, b: false, draft: false };
-    // QRIS lewat DOKU: sistem pembayaran yang mengonfirmasi, Asisten hanya meneruskan statusnya.
+    // QRIS lewat ABC Pay: sistem pembayaran yang mengonfirmasi, Asisten hanya meneruskan statusnya.
     case 'payQris': return s.step === 2 ? { ...s, method: 'qris', qrisPaying: true } : s;
     case 'qrisSettled': return s.qrisPaying ? { ...s, qrisPaying: false, step: 5 } : s;
     case 'toggle': return { ...s, [act.key]: !s[act.key] };
@@ -60,6 +60,8 @@ function reducer(s, act) {
     case 'compose': return { ...s, screen: 'chat', compose: act.mode };
     case 'closeCompose': return { ...s, compose: null };
     case 'addNote': return { ...s, compose: null, notes: [...s.notes, act.text] };
+    // Status pesanan: Bu Sari menekan tahapnya, Asisten mengirim kabar ke pembeli.
+    case 'nextOrd': return s.step >= 5 && s.ord < 3 ? { ...s, ord: s.ord + 1 } : s;
     case 'reset': return initial;
     default: return s;
   }
@@ -81,6 +83,11 @@ function waMessages(s) {
   if (s.reminded) m.push({ who: 'owner', text: s.reminderText || REMINDER, time: '10.17' });
   m.push(...s.extra);
   if (manual && s.step >= 5) m.push({ who: 'owner', text: 'Pembayaran Rp 54.000 sudah kami terima. Terima kasih, Kak Rina!', time: '10.18' });
+  // Kabar status pesanan dari Asisten, dikirim setiap kali Bu Sari menekan tahap berikutnya.
+  if (s.step >= 5) m.push({ who: 'ai', status: 'Pesanan diterima', text: 'Pesanan #22 sudah masuk antrean. Perkiraan siap jam 10.30, diambil di warung.', time: '10.19' });
+  if (s.ord >= 1) m.push({ who: 'ai', status: 'Sedang dibuat', text: 'Kopi susu gula aren dan roti bakar cokelat sedang dibuat. Kopinya kurang manis sesuai catatanmu.', time: '10.22' });
+  if (s.ord >= 2) m.push({ who: 'ai', status: 'Siap diambil', text: 'Pesanan #22 sudah siap. Ambil di kasir dan sebut nama Rina, ya.', time: '10.31' });
+  if (s.ord >= 3) m.push({ who: 'ai', status: 'Selesai', text: 'Pesanan #22 selesai. Terima kasih sudah berbelanja, Kak Rina!', time: '10.40' });
   return m;
 }
 
@@ -118,11 +125,12 @@ function WaPhone({ s, dispatch }) {
         {msgs.map((m, i) => (
           <div key={i} className={`msg${m.out ? ' msg--out' : ''}`}>
             <div className={`bubble ${m.out ? 'bubble--out' : 'bubble--in'}`} style={m.image ? { width: 220 } : undefined}>
+              {m.status && <b className="status-title"><Icon name="check" size={14} width={2.6} />{m.status}</b>}
               {m.image && <div className="placeholder" style={{ height: 72 }}><Icon name="image" size={18} />Foto bukti transfer</div>}
               <span style={{ whiteSpace: 'pre-line' }}>{m.text}</span>
-              {m.qris && <div className="placeholder" style={{ height: 96 }}>QRIS DOKU · Rp 54.000</div>}
+              {m.qris && <div className="placeholder" style={{ height: 96 }}>QRIS ABC Pay · Rp 54.000</div>}
               <span className="bubble__meta">
-                {!m.out && <span className={`from-${m.who}`}>{{ ai: 'Asisten Pintar', owner: 'Bu Sari', system: 'Konfirmasi otomatis · DOKU' }[m.who]}</span>}
+                {!m.out && <span className={`from-${m.who}`}>{{ ai: 'Asisten Pintar', owner: 'Bu Sari', system: 'Konfirmasi otomatis · ABC Pay' }[m.who]}</span>}
                 <span>{m.time}</span>
               </span>
             </div>
@@ -229,8 +237,8 @@ const rp = (n) => 'Rp ' + n.toLocaleString('id-ID');
 // tetapi tidak pernah menyatakan uang sudah masuk tanpa konfirmasi QRIS atau cek Bu Sari.
 function Answer({ m, s, price, setPrice, soldOut, setSoldOut, dispatch }) {
   const [done, setDone] = useState(null);
-  const paid = s.step >= 4;
-  const rinaOwes = s.step >= 2 && s.step <= 3;
+  const paid = m.step >= 4;
+  const rinaOwes = m.step >= 2 && m.step <= 3;
   const card = (children) => <div className="ai-card" style={{ width: 'min(320px, 100%)' }}>{children}</div>;
   if (m.kind === 'unpaid') return card(<>
     <p>Yang belum bayar ada {rinaOwes ? 4 : 3} orang, totalnya <b>{rinaOwes ? 'Rp 239.000' : 'Rp 185.000'}</b>:</p>
@@ -266,9 +274,43 @@ function Answer({ m, s, price, setPrice, soldOut, setSoldOut, dispatch }) {
   </>);
   if (m.kind === 'stok') return card(<p>Gula aren tinggal 3 bungkus, cukup untuk sekitar 30 gelas kopi susu. Bahan lain masih aman sampai besok.</p>);
   return card(<>
-    <p>Maaf, aku belum paham maksudnya. Aku bisa bantu soal pembayaran yang belum masuk, rekap hari ini, stok, harga, dan menu yang habis.</p>
+    <p>Maaf, aku belum paham maksudnya. Aku bisa bantu soal yang belum bayar, rekap hari ini, stok, harga, dan menu yang habis. Ketik saja, misalnya “harga roti bakar jadi 20 ribu”.</p>
     <p className="note">Coba tulis misalnya “siapa yang belum bayar?”</p>
   </>);
+}
+
+const ORD_STEPS = [
+  ['Diterima', 'Masuk antrean'],
+  ['Dibuat', 'Sedang dibuat'],
+  ['Siap', 'Siap diambil'],
+  ['Selesai', 'Sudah diambil']
+];
+const ORD_NEXT = ['Mulai dibuat', 'Tandai siap diambil', 'Tandai selesai'];
+const ORD_TELL = [
+  'Rina akan menerima kabar “Sedang dibuat”.',
+  'Rina akan menerima kabar “Siap diambil, sebut nama Rina di kasir”.',
+  'Rina akan menerima kabar “Pesanan selesai” dan ucapan terima kasih.'
+];
+
+// Status pesanan: Bu Sari yang menekan tahapnya. Asisten hanya mengirim kabarnya ke WhatsApp pembeli.
+function OrderStatus({ s, dispatch }) {
+  return (
+    <div className="ai-card" style={{ width: 'min(320px, 100%)' }} aria-label="Status pesanan Rina">
+      <b>Pesanan #22 · Rina · ambil jam 10</b>
+      <ol className="track">
+        {ORD_STEPS.map(([name], i) => (
+          <li key={name} className={i <= s.ord ? 'is-done' : i === s.ord + 1 ? 'is-now' : ''}>
+            <span className="track__dot">{i <= s.ord && <Icon name="check" size={12} stroke="#fff" width={3} />}</span>
+            <span>{name}</span>
+          </li>
+        ))}
+      </ol>
+      <span className="note">{s.ord < 3 ? ORD_TELL[s.ord] : 'Pesanan Rina selesai. Kabar terakhir sudah terkirim.'}</span>
+      {s.ord < 3 && (
+        <button type="button" className="btn btn--primary btn--block" onClick={() => dispatch({ type: 'nextOrd' })}>{ORD_NEXT[s.ord]}</button>
+      )}
+    </div>
+  );
 }
 
 function Chat({ s, dispatch }) {
@@ -293,7 +335,8 @@ function Chat({ s, dispatch }) {
       : /harga/.test(t) ? 'harga'
       : /stok|sisa|bahan/.test(t) ? 'stok'
       : 'unknown';
-    setTalk((x) => [...x, { q, kind, id: x.length }]);
+    // Simpan keadaan saat ditanya supaya jawaban lama tidak ikut berubah.
+    setTalk((x) => [...x, { q, kind, id: x.length, step: s.step }]);
     setAsk('');
   };
   const SAMPLE = '2 es teh manis, 1 pisang goreng, makan di tempat';
@@ -320,7 +363,7 @@ function Chat({ s, dispatch }) {
               <div className="items__total"><span>Total</span><span>Rp 54.000</span></div>
             </div>
             <button type="button" className="btn btn--primary btn--block is-target" onClick={() => dispatch({ type: 'sendTotal' })}>Kirim total & link QRIS</button>
-            <span className="note">Total, QRIS DOKU, dan rekening Bank ABC terkirim ke WhatsApp Rina atas namamu. Aku tidak menagih.</span>
+            <span className="note">Total, QRIS ABC Pay, dan rekening Bank ABC terkirim ke WhatsApp Rina atas namamu. Aku tidak menagih.</span>
           </div>
         )}
         {s.step >= 2 && (
@@ -370,7 +413,7 @@ function Chat({ s, dispatch }) {
         {s.step >= 5 && s.method === 'qris' && (
           <div className="ai-card" style={{ width: 'min(320px, 100%)' }}>
             <span className="badge badge--success"><Icon name="check" size={14} width={2.6} />Lunas otomatis · QRIS</span>
-            <p>Rina membayar Rp 54.000 lewat QRIS. Sistem pembayaran DOKU sudah mengonfirmasi, jadi kamu tidak perlu cek rekening.</p>
+            <p>Rina membayar Rp 54.000 lewat QRIS. Sistem pembayaran ABC Pay sudah mengonfirmasi, jadi kamu tidak perlu cek rekening.</p>
             <button type="button" className={`btn btn--ghost${s.step === 5 ? ' is-target' : ''}`} style={{ alignSelf: 'flex-start' }} onClick={() => dispatch({ type: 'screen', screen: 'laporan' })}>Lihat laporan</button>
           </div>
         )}
@@ -384,6 +427,7 @@ function Chat({ s, dispatch }) {
             </div>
           </>
         )}
+        {s.step >= 5 && <OrderStatus s={s} dispatch={dispatch} />}
         {s.notes.map((n, k) => (
           <div key={k} style={{ display: 'contents' }}>
             <div className="me">{n}</div>
@@ -423,10 +467,9 @@ function Chat({ s, dispatch }) {
         )}
       </div>
       <div className="chips" role="group" aria-label="Contoh yang bisa kamu minta">
-        {['Siapa yang belum bayar?', 'Rekap hari ini', 'Pisang goreng habis', 'Harga roti bakar jadi 20 ribu', 'Stok bahan'].map((q) => (
+        {['Siapa yang belum bayar?', 'Rekap hari ini', 'Pisang goreng habis'].map((q) => (
           <button key={q} type="button" className="btn btn--outline" onClick={() => say(q)}>{q}</button>
         ))}
-        <button type="button" className="btn btn--outline" onClick={() => dispatch({ type: 'compose', mode: 'ketik' })}>Catat pesanan warung</button>
       </div>
       <form className="ask" onSubmit={(e) => { e.preventDefault(); if (ask.trim()) say(ask.trim()); }}>
         <label htmlFor="tanya-asisten" className="sr-only">Tulis pesan untuk Asisten</label>
@@ -443,7 +486,6 @@ function Laporan({ s }) {
   const viaQris = paid && s.method === 'qris';
   const qris = 845000 + (viaQris ? 54000 : 0);
   const manual = 400000 + (paid && !viaQris ? 54000 : 0);
-  const bars = [['07', 210], ['09', 260], ['11', 140], ['13', 175], ['15', 150], ['17', 190], ['19', 120]];
   const owes = [...(rinaOwes ? [['Rina', 'total dikirim 10.12', 54000]] : []), ['Pak Joko', 'sejak kemarin', 85000], ['Mbak Tari', '09.40', 60000], ['Dimas', '08.15', 40000]];
   return (
     <div className="app-screen">
@@ -454,30 +496,19 @@ function Laporan({ s }) {
         <span className="money__big">{rp(qris + manual)}</span>
         <span className="note" style={{ color: 'var(--success-text)', fontWeight: 600 }}>{paid ? 'Rp 204.000' : 'Rp 150.000'} lebih banyak dari Kamis lalu</span>
         <div className="split">
-          <div><span>Lewat QRIS</span><b>{rp(qris)}</b><small>Pasti masuk, dikonfirmasi DOKU</small></div>
+          <div><span>Lewat QRIS</span><b>{rp(qris)}</b><small>Pasti masuk, dikonfirmasi ABC Pay</small></div>
           <div><span>Transfer & tunai</span><b>{rp(manual)}</b><small>Kamu yang cek di rekening dan laci</small></div>
         </div>
-      </section>
-      <section className="report-card" aria-label="Kapan paling ramai">
-        <b>Kapan paling ramai</b>
-        <div className="bars" role="img" aria-label="Uang masuk per jam, paling ramai jam 09.00">
-          {bars.map(([h, v]) => (
-            <div className="bars__col" key={h}>
-              <div className={`bars__bar${v === 260 ? ' bars__bar--top' : ''}`} style={{ height: Math.round((v / 260) * 72) }} />
-              <span>{h}</span>
-            </div>
-          ))}
-        </div>
-        <span className="note">Jam 09.00 paling ramai. Siapkan bahan sebelum jam 08.30.</span>
+        <div className="info">Paling ramai jam 09.00. Siapkan bahan sebelum jam 08.30.</div>
       </section>
       <section className="report-card" aria-label="Paling laku">
-        <b>Paling laku</b>
+        <b>Paling laku hari ini</b>
         <div className="items">
           <div className="items__row"><span>Kopi susu gula aren</span><span>26 gelas</span></div>
           <div className="items__row"><span>Es teh manis</span><span>21 gelas</span></div>
           <div className="items__row"><span>Roti bakar cokelat</span><span>9 porsi</span></div>
         </div>
-        <div className="warn">Gula aren tinggal 3 bungkus, cukup untuk sekitar 30 gelas. Beli lagi sebelum besok pagi.</div>
+        <div className="warn">Gula aren tinggal 3 bungkus. Beli lagi sebelum besok pagi.</div>
       </section>
       <section className="unpaid" aria-label="Belum dibayar">
         <span>Belum dibayar · {owes.length} orang</span>
@@ -525,7 +556,7 @@ export default function Prototipe() {
   const [s, dispatch] = useReducer(reducer, initial);
   let g = GUIDE[s.step];
   if (s.step === 2 && s.qrisPaying) g = { who: 'wa', label: 'HP pembeli', text: 'Rina membayar lewat QRIS. Sistem pembayaran sedang memproses.' };
-  else if (s.step === 5 && s.method === 'qris') g = { who: 'app', label: 'HP Bu Sari', text: 'QRIS dikonfirmasi otomatis oleh sistem pembayaran DOKU. Buka Laporan untuk melihat uangnya tercatat.' };
+  else if (s.step === 5 && s.method === 'qris') g = { who: 'app', label: 'HP Bu Sari', text: 'QRIS dikonfirmasi otomatis oleh sistem pembayaran ABC Pay. Buka Laporan untuk melihat uangnya tercatat.' };
   else if (s.step === 3 && s.reminded && !s.rinaNote) g = { who: 'wa', label: 'HP pembeli', text: 'Pengingat sampai ke Rina. Balas sebagai Rina, pakai tombol cepat atau ketik sendiri.' };
   else if (s.step === 3 && s.rinaNote) g = { who: 'app', label: 'HP Bu Sari', text: 'Rina sudah membalas. Cek lagi rekeningmu, centang dua hal, lalu tandai lunas.' };
   const [view, setView] = useState('wa');
@@ -562,7 +593,7 @@ export default function Prototipe() {
     <>
       <div className="page-head">
         <h1>Dari chat pembeli sampai laporan</h1>
-        <p>Rina memesan di WhatsApp, Asisten Pintar membalas dan mencatat, Bu Sari yang mengirim tagihan. Bayar lewat QRIS dikonfirmasi otomatis oleh sistem pembayaran DOKU, transfer manual dicek Bu Sari. Ikuti petunjuk, tombol yang perlu ditekan diberi lingkaran oranye.</p>
+        <p>Rina memesan di WhatsApp, Asisten Pintar membalas dan mencatat, Bu Sari yang mengirim tagihan. Bayar lewat QRIS dikonfirmasi otomatis oleh sistem pembayaran ABC Pay, transfer manual dicek Bu Sari. Ikuti petunjuk, tombol yang perlu ditekan diberi lingkaran oranye.</p>
       </div>
 
       <div className="guide" role="status" aria-live="polite">

@@ -79,13 +79,15 @@ export const SCENES = [
     ]
   },
   {
-    id: 'wa7', title: '7 · Dikonfirmasi Bu Sari & status',
-    note: 'Status mengikuti pilihan ambil di warung: “sudah siap, ambil di kasir”.',
+    id: 'wa7', title: '7 · Status pesanan, tahap demi tahap',
+    note: 'Bu Sari menekan tahapnya di aplikasi, Asisten mengirim kabarnya. Untuk ambil di warung, tidak ada kabar “dalam perjalanan”.',
     msgs: [
-      { type: 'in', who: 'owner', time: '11.24', text: 'Pembayaran Rp 72.000 sudah kami terima. Terima kasih, Kak Dimas! Pesananmu langsung kami buat.' },
-      { type: 'in', who: 'ai', time: '11.25', text: 'Pesanan #21 sedang dibuat.' },
-      { type: 'in', who: 'ai', time: '11.38', text: 'Pesanan #21 sudah siap. Ambil di kasir dan sebut nama Dimas, ya.', replies: ['Lihat lokasi warung'] },
-      { type: 'out', text: 'Oke kak, otw', time: '11.39' }
+      { type: 'in', who: 'owner', time: '11.24', text: 'Pembayaran Rp 72.000 sudah kami terima. Terima kasih, Kak Dimas!' },
+      { type: 'in', who: 'ai', time: '11.24', title: 'Pesanan diterima', text: 'Pesanan #21 sudah masuk antrean. Perkiraan siap jam 11.40, diambil di warung.' },
+      { type: 'in', who: 'ai', time: '11.25', title: 'Sedang dibuat', text: 'Kopi susu gula aren (kurang manis) dan roti bakar cokelat sedang dibuat.' },
+      { type: 'in', who: 'ai', time: '11.38', title: 'Siap diambil', text: 'Pesanan #21 sudah siap. Ambil di kasir dan sebut nama Dimas, ya.', replies: ['Lihat lokasi warung'] },
+      { type: 'out', text: 'Oke kak, otw', time: '11.39' },
+      { type: 'in', who: 'ai', time: '11.45', title: 'Selesai', text: 'Pesanan #21 selesai. Terima kasih sudah berbelanja, Kak Dimas!' }
     ]
   },
   {
@@ -111,13 +113,13 @@ export const SCENES = [
 ];
 
 export const COMPARE = [
-  ['Bot mengirim QRIS dan menyebut pembayaran akan terkonfirmasi otomatis.', 'Total dan cara bayar dikirim Bu Sari dari aplikasi. Asisten hanya bilang totalnya akan menyusul.'],
-  ['Konfirmasi “pembayaran sudah kami terima” dikirim oleh bot.', 'Hanya Bu Sari yang mengonfirmasi, setelah cek rekening.'],
+  ['Bot mengirim QRIS dan menyebut pembayaran akan terkonfirmasi otomatis.', 'Dipertahankan. Total dikirim Bu Sari dengan QRIS di urutan pertama, dan konfirmasinya bertanda “Konfirmasi otomatis · ABC Pay”, terpisah dari Asisten.'],
+  ['Konfirmasi “pembayaran sudah kami terima” dikirim oleh bot.', 'Untuk transfer manual, hanya Bu Sari yang mengonfirmasi setelah cek rekening. Asisten tidak menilai foto bukti.'],
   ['Pembeli mengetik perintah: checkout, hapus 2, kosongkan, pickup, delivery.', 'Tombol balasan berbahasa sehari-hari: “Sudah, itu saja”, “Ambil di warung”.'],
   ['Mengubah jumlah memakai format tertentu, misalnya “dirty latte ubah 1 jadi 10”.', 'Pembeli cukup bilang “kopinya jadi 3 deh”.'],
   ['Minimal pembelian baru muncul setelah checkout.', 'Minimal pesan ditulis di menu sejak awal.'],
   ['Stok “perlu dikonfirmasi” tampil bersama harga.', 'Label “Habis hari ini”, lalu Asisten menawarkan pengganti.'],
-  ['Pesanan diambil di toko juga menerima status “sedang dalam perjalanan”.', 'Status mengikuti pilihan: “sudah siap, ambil di kasir”.'],
+  ['Pesanan diambil di toko juga menerima status “sedang dalam perjalanan”.', 'Status mengikuti pilihan: diterima, sedang dibuat, siap diambil di kasir, selesai.'],
   ['Nomor pesanan “ORD-6309cc5d”, sapaan “Anda”.', '“Pesanan #21”, sapaan “Kak” dan “kamu”.'],
   ['“Saya sambungkan ke admin” muncul tanpa keterangan kenapa.', 'Asisten bilang kenapa, dan Bu Sari membalas di chat yang sama.'],
   ['Pesan dari bot dan dari admin terlihat sama.', 'Setiap pesan diberi tanda pengirim: Asisten Pintar atau Bu Sari.']

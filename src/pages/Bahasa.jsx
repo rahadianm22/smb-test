@@ -7,7 +7,7 @@ const ROWS = [
   ['Catatan setelah diambil alih', 'Alasan diserahkan ke orang: Diambil alih anggota tim.', 'Kamu yang membalas chat ini sejak 10.05. Asisten diam dulu.', 'Menyebut kamu dan jamnya, lalu apa akibatnya.'],
   ['Pesan menu di WhatsApp', 'Untuk memesan, ketik *nomor* dan jumlah (mis. "1 2" = 2 porsi item nomor 1)', 'Tulis saja seperti biasa, misalnya “2 kopi susu sama 1 roti bakar”.', 'Pembeli tidak perlu belajar format. Asisten yang membaca.'],
   ['Kartu Beranda', '1 pesanan menunggu pembayaran · Pelanggan belum membayar. Tidak perlu diproses dulu.', 'Rina belum bayar Rp 28.000. Jangan dibuat dulu, ya.', 'Ada nama, angka, dan satu hal yang harus dilakukan.'],
-  ['Konfirmasi DOKU', 'Status pembayaran: berhasil', 'Uang Rp 54.000 dari Rina sudah masuk lewat QRIS.', 'Bu Sari langsung tahu boleh membuat pesanan tanpa cek rekening.'],
+  ['Konfirmasi ABC Pay', 'Status pembayaran: berhasil', 'Uang Rp 54.000 dari Rina sudah masuk lewat QRIS.', 'Bu Sari langsung tahu boleh membuat pesanan tanpa cek rekening.'],
   ['Status toko di atas', 'Tayang · Asisten dimatikan', 'Toko buka. Asisten sedang libur, chat kamu balas sendiri.', '“Tayang” istilah media. Akibatnya bagi Bu Sari harus tertulis.'],
   ['Kuota di Ringkasan', '0 dari 300 balasan terpakai · 0% terpakai', 'Asisten masih bisa membalas 300 chat sampai 12 Nov.', 'Yang ia perlu tahu sisa dan batas waktunya, bukan persentase.'],
   ['Ringkasan kosong', 'Belum ada aktivitas di periode ini.', 'Belum ada pesanan semalam. Bagikan link tokomu supaya pembeli mulai chat.', 'Layar kosong memberi langkah berikutnya.']

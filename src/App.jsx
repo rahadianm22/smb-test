@@ -59,7 +59,7 @@ export default function App() {
         <Page />
       </main>
       <footer className="site-footer">
-        Data contoh: nama pembeli, angka uang, menu, harga, dan nomor rekening dibuat untuk tes, bukan data asli Sejati SMB.
+        Data contoh: nama pembeli, angka uang, menu, harga, nomor rekening, dan nama sistem pembayaran (ABC Pay) dibuat untuk tes, bukan data asli Sejati SMB.
       </footer>
     </>
   );
