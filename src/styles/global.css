@@ -176,6 +176,14 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
   flex: 1; min-width: 0; padding: 6px 14px; border-radius: 22px; background: var(--bg-canvas);
   border: 1px solid var(--border-default); font-size: 14px; line-height: 20px;
 }
+.composer__form { flex: 1; display: flex; gap: 8px; align-items: center; min-width: 0; }
+.composer__input {
+  flex: 1; min-width: 0; min-height: 44px; padding: 0 16px; border-radius: 22px;
+  border: 1px solid var(--border-strong); background: var(--bg-canvas); font-size: 15px;
+}
+.icon-btn:disabled { background: var(--border-default); }
+.quick { flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px; background: var(--bg-chat); }
+.quick__btn { min-height: 44px; border-radius: var(--r-full); font-size: 14px; white-space: normal; text-align: left; }
 .composer__idle { flex: 1; min-height: 44px; display: flex; align-items: center; padding: 0 16px; border-radius: 22px; background: var(--bg-canvas); border: 1px solid var(--border-default); color: var(--text-muted); }
 .icon-btn {
   flex: none; width: 44px; height: 44px; border-radius: var(--r-full); border: none;

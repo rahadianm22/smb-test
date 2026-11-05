@@ -18,7 +18,13 @@ const GUIDE = [
 
 const REMINDER = 'Halo Kak Rina, transfernya belum masuk di rekening kami. Boleh dicek lagi ya, totalnya Rp 54.000. Terima kasih!';
 
-const initial = { step: 0, screen: 'beranda', typing: false, a: false, b: false, draft: false, reminded: false, snack: false };
+const initial = {
+  step: 0, screen: 'beranda', typing: false, a: false, b: false, draft: false, reminded: false, snack: false,
+  extra: [], pendingAi: null, rinaNote: null
+};
+
+// Balasan cepat Rina setelah menerima pengingat dari Bu Sari.
+const RINA_QUICK = ['Maaf kak, sudah aku transfer ulang', 'Oke kak, aku cek dulu ya'];
 
 function reducer(s, act) {
   switch (act.type) {
@@ -30,10 +36,22 @@ function reducer(s, act) {
     case 'toggle': return { ...s, [act.key]: !s[act.key] };
     case 'openDraft': return { ...s, draft: true };
     case 'closeDraft': return { ...s, draft: false };
-    case 'sendReminder': return { ...s, draft: false, reminded: true };
+    case 'sendReminder': return { ...s, draft: false, reminded: true, reminderText: act.text };
     case 'markPaid': return s.a && s.b ? { ...s, step: 4, snack: true } : s;
     case 'confirmSent': return s.step === 4 ? { ...s, step: 5, snack: false } : s;
     case 'undo': return { ...s, step: 3, snack: false, a: false, b: false };
+    // Rina membalas dari WhatsApp. AI hanya meneruskan ke Bu Sari, tidak memutuskan apa pun soal bayar.
+    case 'rinaSay': {
+      const reply = s.step === 3
+        ? 'Terima kasih, Kak! Pesanmu sudah aku teruskan ke Bu Sari. Bu Sari cek lagi pembayarannya, nanti dikabari, ya.'
+        : 'Pesanmu sudah aku teruskan ke Bu Sari, ya.';
+      const atCheck = s.step === 3;
+      return {
+        ...s, extra: [...s.extra, { out: true, text: act.text, time: act.time }], pendingAi: reply,
+        rinaNote: atCheck ? act.text : s.rinaNote, a: atCheck ? false : s.a, b: atCheck ? false : s.b
+      };
+    }
+    case 'aiReplied': return s.pendingAi ? { ...s, extra: [...s.extra, { who: 'ai', text: s.pendingAi, time: s.extra[s.extra.length - 1].time }], pendingAi: null } : s;
     case 'reset': return initial;
     default: return s;
   }
@@ -49,18 +67,33 @@ function waMessages(s) {
   if (s.step >= 2) m.push({ who: 'owner', text: 'Totalnya Rp 54.000 ya, Kak. Transfer ke Bank ABC 123 456 7890 a.n. Sari Wulandari, atau scan QRIS di kasir.', time: '10.12' });
   if (s.step >= 3) m.push({ out: true, image: true, text: 'Udah transfer ya kak, ini buktinya', time: '10.15' });
   if (s.step >= 3 && !t3) m.push({ who: 'ai', text: 'Terima kasih, Kak! Bu Sari cek dulu pembayarannya, nanti dikabari, ya.', time: '10.15' });
-  if (s.reminded) m.push({ who: 'owner', text: REMINDER, time: '10.17' });
+  if (s.reminded) m.push({ who: 'owner', text: s.reminderText || REMINDER, time: '10.17' });
+  m.push(...s.extra);
   if (s.step >= 5) m.push({ who: 'owner', text: 'Pembayaran Rp 54.000 sudah kami terima. Terima kasih, Kak Rina!', time: '10.18' });
   return m;
 }
 
+function nowTime(n) {
+  // Jam contoh yang terus maju supaya urutan chat masuk akal.
+  const mins = 18 + n;
+  return '10.' + String(mins).padStart(2, '0');
+}
+
 function WaPhone({ s, dispatch }) {
   const body = useRef(null);
+  const [text, setText] = useState('');
+  const say = (t) => {
+    const v = t.trim();
+    if (!v || s.pendingAi) return;
+    dispatch({ type: 'rinaSay', text: v, time: nowTime(s.extra.length) });
+    setText('');
+  };
+  const canQuick = s.step === 3 && s.reminded && !s.rinaNote;
   const msgs = waMessages(s);
   useEffect(() => {
     const el = body.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [msgs.length, s.typing]);
+  }, [msgs.length, s.typing, s.pendingAi]);
 
   return (
     <div className="phone">
@@ -83,8 +116,15 @@ function WaPhone({ s, dispatch }) {
             </div>
           </div>
         ))}
-        {s.typing && <div className="bubble bubble--in" style={{ alignSelf: 'flex-start', color: 'var(--text-secondary)' }}>Sedang mengetik…</div>}
+        {(s.typing || s.pendingAi) && <div className="bubble bubble--in" style={{ alignSelf: 'flex-start', color: 'var(--text-secondary)' }}>Sedang mengetik…</div>}
       </div>
+      {canQuick && (
+        <div className="quick" role="group" aria-label="Balasan cepat Rina">
+          {RINA_QUICK.map((q, i) => (
+            <button key={q} type="button" className={`btn btn--outline quick__btn${i === 0 ? ' is-target' : ''}`} onClick={() => say(q)}>{q}</button>
+          ))}
+        </div>
+      )}
       <div className="composer">
         {s.step === 0 && (
           <>
@@ -99,7 +139,15 @@ function WaPhone({ s, dispatch }) {
             <Icon name="image" stroke="#fff" />Kirim foto bukti transfer
           </button>
         )}
-        {s.step !== 0 && s.step !== 2 && <div className="composer__idle">Ketik pesan</div>}
+        {s.step !== 0 && s.step !== 2 && (
+          <form className="composer__form" onSubmit={(e) => { e.preventDefault(); say(text); }}>
+            <label htmlFor="pesan-rina" className="visually-hidden">Tulis pesan sebagai Rina</label>
+            <input id="pesan-rina" className="composer__input" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ketik pesan sebagai Rina" autoComplete="off" />
+            <button type="submit" className="icon-btn btn--wa" aria-label="Kirim pesan Rina" disabled={!text.trim() || !!s.pendingAi}>
+              <Icon name="send" stroke="#fff" />
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -189,6 +237,13 @@ function Chat({ s, dispatch }) {
             <div className="placeholder" style={{ height: 56 }}><Icon name="image" size={18} />Foto bukti transfer</div>
           </div>
         )}
+        {s.step === 3 && s.rinaNote && !s.draft && (
+          <div className="ai-card ai-card--plain">
+            <span className="note" style={{ fontWeight: 700 }}>Balasan Rina di WhatsApp</span>
+            <p>“{s.rinaNote}”</p>
+            <div className="info">Cek lagi rekeningmu sebelum tandai lunas. Centangnya aku kosongkan dulu.</div>
+          </div>
+        )}
         {s.step === 3 && !s.draft && (
           <div className="ai-card">
             <div className="warn">Bukti transfer bisa palsu. Cek dulu di aplikasi Bank ABC-mu:</div>
@@ -208,7 +263,7 @@ function Chat({ s, dispatch }) {
               <label htmlFor="draf">Isi pesan, bisa kamu ubah</label>
               <textarea id="draf" rows={4} value={draftText} onChange={(e) => setDraftText(e.target.value)} />
             </div>
-            <button type="button" className="btn btn--primary btn--block" disabled={!draftText.trim()} onClick={() => dispatch({ type: 'sendReminder' })}>Kirim ke Rina</button>
+            <button type="button" className="btn btn--primary btn--block" disabled={!draftText.trim()} onClick={() => dispatch({ type: 'sendReminder', text: draftText.trim() })}>Kirim ke Rina</button>
             <button type="button" className="btn btn--ghost" style={{ alignSelf: 'flex-start' }} onClick={() => dispatch({ type: 'closeDraft' })}>Ternyata sudah masuk? Cek lagi</button>
           </div>
         )}
@@ -290,17 +345,25 @@ function AppPhone({ s, dispatch }) {
 
 export default function Prototipe() {
   const [s, dispatch] = useReducer(reducer, initial);
-  const g = GUIDE[s.step];
+  let g = GUIDE[s.step];
+  if (s.step === 3 && s.reminded && !s.rinaNote) g = { who: 'wa', label: 'HP pembeli', text: 'Pengingat sampai ke Rina. Balas sebagai Rina, pakai tombol cepat atau ketik sendiri.' };
+  else if (s.step === 3 && s.rinaNote) g = { who: 'app', label: 'HP Bu Sari', text: 'Rina sudah membalas. Cek lagi rekeningmu, centang dua hal, lalu tandai lunas.' };
   const [view, setView] = useState('wa');
 
   // Di layar kecil, tampilkan HP yang sedang diminta petunjuk.
-  useEffect(() => { setView(g.who); }, [s.step, g.who]);
+  useEffect(() => { setView(g.who); }, [s.step, g.who, g.text]);
 
   useEffect(() => {
     if (!s.typing) return undefined;
     const t = setTimeout(() => dispatch({ type: 'typed' }), 900);
     return () => clearTimeout(t);
   }, [s.typing]);
+
+  useEffect(() => {
+    if (!s.pendingAi) return undefined;
+    const t = setTimeout(() => dispatch({ type: 'aiReplied' }), 900);
+    return () => clearTimeout(t);
+  }, [s.pendingAi]);
 
   useEffect(() => {
     if (s.step !== 4) return undefined;
