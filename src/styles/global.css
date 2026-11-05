@@ -154,6 +154,9 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .bubble__meta { display: flex; justify-content: space-between; gap: 16px; font-size: 11px; line-height: 14px; color: var(--text-secondary); }
 .bubble--out .bubble__meta { justify-content: flex-end; }
 .from-ai { font-weight: 700; color: var(--from-ai); }
+.from-system { font-weight: 700; color: var(--success-text); }
+.composer__choices { flex: 1; display: flex; gap: 8px; }
+.composer__choices .btn { flex: 1; padding: 0 10px; }
 .from-owner { font-weight: 700; color: var(--from-owner); }
 .reply {
   min-height: 40px; display: flex; align-items: center; justify-content: center; padding: 0 12px;
@@ -322,3 +325,16 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .decision { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
 .decision > div { padding: 16px; border-radius: var(--r-16); background: var(--bg-surface); border: 1.5px solid var(--border-default); }
 .rule { margin-top: 24px; display: flex; gap: 16px; align-items: flex-start; padding: 20px; border-radius: var(--r-16); border: 1.5px solid var(--bg-brand); background: var(--bg-surface); }
+
+/* Kolom tulis Bu Sari ke Asisten */
+.ask { flex: none; display: flex; gap: 8px; align-items: center; padding: 8px 12px 12px; background: var(--bg-canvas); }
+.ask__send { background: var(--bg-brand); border-radius: var(--r-full); flex: none; }
+.ask__send:disabled { opacity: .45; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.split > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--r-12); background: var(--bg-canvas); }
+.split span { font-size: 13px; color: var(--text-secondary); }
+.split b { font-size: 16px; }
+.split small { font-size: 12px; line-height: 16px; color: var(--text-secondary); }
+.unpaid .items { margin-top: 8px; }
+.unpaid .items__row span { font-weight: 500; color: var(--text-primary); }
