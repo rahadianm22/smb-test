@@ -202,6 +202,13 @@ main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
 .app-screen h3 { font-size: 18px; line-height: 26px; }
 .greet span { display: block; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
 .money { background: var(--bg-brand); color: var(--text-on-brand); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.money__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.eye-btn { background: rgba(255, 255, 255, .16); color: var(--white); }
+.actions { display: flex; gap: 12px; }
+.actions .btn--dark { flex: 1; }
+.chips { flex: none; display: flex; gap: 8px; padding: 8px 12px; overflow-x: auto; background: var(--bg-canvas); border-top: 1px solid var(--border-subtle); }
+.chips .btn { flex: none; border-radius: var(--r-full); font-size: 14px; border-width: 1px; }
+.chips .btn[aria-pressed="true"] { border-color: var(--bg-brand); color: var(--text-link); }
 .money__label { font-size: 14px; line-height: 20px; font-weight: 500; }
 .money__big { font-size: 32px; line-height: 40px; font-weight: 700; }
 .money__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .28); }

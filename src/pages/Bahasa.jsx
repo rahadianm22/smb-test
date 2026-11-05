@@ -37,7 +37,7 @@ export default function Bahasa() {
       </div>
       <div className="why">
         <b>Kenapa bahasa penting bagi UMKM</b>
-        <p>Pemilik usaha memakai aplikasi di sela kerja, jadi kata yang sudah mereka pakai sehari-hari membuat mereka langsung paham harus berbuat apa: tidak salah tekan, tidak takut mencoba, dan tidak perlu bertanya ke orang lain.</p>
+        <p>Pemilik usaha membaca layar sambil melayani pembeli, jadi kata yang sudah mereka pakai sehari-hari membuat mereka paham harus menekan apa tanpa berhenti untuk menebak.</p>
       </div>
     </>
   );

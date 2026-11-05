@@ -4,13 +4,13 @@ import Icon from '../components/Icon.jsx';
 /*
   Prototipe dua HP. Aksi di satu HP mengubah HP lainnya.
   step: 0 pesan · 1 catat · 2 bayar · 3 cek · 4 bisa dibatalkan · 5 lihat laporan · 6 selesai
-  Aturan produk: Asisten AI tidak menagih dan tidak mengonfirmasi pembayaran.
+  Aturan produk: Asisten Pintar tidak menagih dan tidak mengonfirmasi pembayaran.
 */
 const GUIDE = [
   { who: 'wa', label: 'HP pembeli', text: 'Rina memesan lewat WhatsApp. Tekan tombol kirim yang ditandai.' },
-  { who: 'app', label: 'HP Bu Sari', text: 'Asisten AI sudah membalas dan mencatat. Buka pesanan Rina, lalu tekan “Kirim total ke Rina”.' },
+  { who: 'app', label: 'HP Bu Sari', text: 'Asisten Pintar sudah membalas dan mencatat. Buka pesanan Rina, lalu tekan “Kirim total ke Rina”.' },
   { who: 'wa', label: 'HP pembeli', text: 'Total dan rekening Bank ABC sudah sampai. Tekan “Kirim foto bukti transfer”.' },
-  { who: 'app', label: 'HP Bu Sari', text: 'Bukti masuk, tapi AI tidak bilang lunas. Cek rekening, centang dua hal, lalu tandai lunas.' },
+  { who: 'app', label: 'HP Bu Sari', text: 'Bukti masuk, tapi Asisten tidak bilang lunas. Cek rekening, centang dua hal, lalu tandai lunas.' },
   { who: 'app', label: 'HP Bu Sari', text: 'Masih bisa dibatalkan 5 detik. Setelah itu konfirmasi terkirim ke Rina.' },
   { who: 'app', label: 'HP Bu Sari', text: 'Konfirmasi sudah sampai ke Rina. Buka Laporan untuk melihat uangnya tercatat.' },
   { who: 'app', label: 'Selesai', text: 'Uang Rina sudah tercatat di laporan hari ini. Tekan Ulangi untuk mencoba lagi.' }
@@ -20,7 +20,7 @@ const REMINDER = 'Halo Kak Rina, transfernya belum masuk di rekening kami. Boleh
 
 const initial = {
   step: 0, screen: 'beranda', typing: false, a: false, b: false, draft: false, reminded: false, snack: false,
-  extra: [], pendingAi: null, rinaNote: null
+  extra: [], pendingAi: null, rinaNote: null, compose: null, notes: []
 };
 
 // Balasan cepat Rina setelah menerima pengingat dari Bu Sari.
@@ -40,7 +40,7 @@ function reducer(s, act) {
     case 'markPaid': return s.a && s.b ? { ...s, step: 4, snack: true } : s;
     case 'confirmSent': return s.step === 4 ? { ...s, step: 5, snack: false } : s;
     case 'undo': return { ...s, step: 3, snack: false, a: false, b: false };
-    // Rina membalas dari WhatsApp. AI hanya meneruskan ke Bu Sari, tidak memutuskan apa pun soal bayar.
+    // Rina membalas dari WhatsApp. Asisten hanya meneruskan ke Bu Sari, tidak memutuskan apa pun soal bayar.
     case 'rinaSay': {
       const reply = s.step === 3
         ? 'Terima kasih, Kak! Pesanmu sudah aku teruskan ke Bu Sari. Bu Sari cek lagi pembayarannya, nanti dikabari, ya.'
@@ -52,6 +52,10 @@ function reducer(s, act) {
       };
     }
     case 'aiReplied': return s.pendingAi ? { ...s, extra: [...s.extra, { who: 'ai', text: s.pendingAi, time: s.extra[s.extra.length - 1].time }], pendingAi: null } : s;
+    // Pesanan yang datang langsung ke warung, dicatat Bu Sari lewat Asisten.
+    case 'compose': return { ...s, screen: 'chat', compose: act.mode };
+    case 'closeCompose': return { ...s, compose: null };
+    case 'addNote': return { ...s, compose: null, notes: [...s.notes, act.text] };
     case 'reset': return initial;
     default: return s;
   }
@@ -163,17 +167,29 @@ function Beranda({ s, dispatch }) {
   else if (s.step === 3) first = { kind: 'wallet', icon: 'wallet', title: 'Rina kirim bukti transfer', sub: 'Rp 54.000 · cek dulu uangnya', btn: 'Cek uang' };
   else first = { kind: 'order', icon: 'receipt', title: 'Pesanan baru dari Pak Joko', sub: '2 kopi susu, 1 roti bakar' };
   const rows = [first, { kind: 'box', icon: 'box', title: 'Gula aren tinggal 3 bungkus', sub: 'Tambah stok sebelum habis' }];
+  // Angka uang bisa disembunyikan karena layar HP sering terlihat pembeli di kasir.
+  const [hide, setHide] = useState(false);
+  const money = (v) => (hide ? 'Rp ••••••' : v);
 
   return (
     <div className="app-screen">
       <div className="greet"><span>Kamis, 5 November</span><h2>Halo, Bu Sari</h2></div>
       <section className="money" aria-label="Uang masuk hari ini">
-        <div><div className="money__label">Uang masuk hari ini</div><div className="money__big">{paid ? 'Rp 1.299.000' : 'Rp 1.245.000'}</div></div>
+        <div className="money__top">
+          <div><div className="money__label">Uang masuk hari ini</div><div className="money__big">{money(paid ? 'Rp 1.299.000' : 'Rp 1.245.000')}</div></div>
+          <button type="button" className="icon-btn eye-btn" aria-pressed={hide} aria-label={hide ? 'Tampilkan angka' : 'Sembunyikan angka'} onClick={() => setHide(!hide)}>
+            <Icon name={hide ? 'eyeOff' : 'eye'} size={22} />
+          </button>
+        </div>
         <div className="money__grid">
           <div><b>{paid ? '19' : '18'} pesanan</b><span>sudah lunas</span></div>
-          <div><b>{pending ? 'Rp 239.000' : 'Rp 185.000'}</b><span>belum dibayar ({pending ? 4 : 3})</span></div>
+          <div><b>{money(pending ? 'Rp 239.000' : 'Rp 185.000')}</b><span>belum dibayar ({pending ? 4 : 3})</span></div>
         </div>
       </section>
+      <div className="actions">
+        <button type="button" className="btn btn--dark btn--lg" onClick={() => dispatch({ type: 'compose', mode: 'ketik' })}><Icon name="plus" size={22} width={2.4} />Catat pesanan</button>
+        <button type="button" className="btn btn--outline btn--lg" onClick={() => dispatch({ type: 'compose', mode: 'bicara' })}><Icon name="mic" size={22} />Bicara</button>
+      </div>
       <section>
         <h3 style={{ marginBottom: 8 }}>Perlu kamu cek</h3>
         <div className="list">
@@ -197,11 +213,14 @@ function Beranda({ s, dispatch }) {
 function Chat({ s, dispatch }) {
   const ready = s.a && s.b;
   const [draftText, setDraftText] = useState(REMINDER);
+  const [orderText, setOrderText] = useState('');
+  const [stock, setStock] = useState(false);
   const chatRef = useRef(null);
   useEffect(() => {
     const el = chatRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [s.step, s.draft, s.reminded]);
+  }, [s.step, s.draft, s.reminded, s.compose, s.notes.length, stock]);
+  const SAMPLE = '2 es teh manis, 1 pisang goreng, makan di tempat';
 
   return (
     <>
@@ -277,6 +296,47 @@ function Chat({ s, dispatch }) {
             </div>
           </>
         )}
+        {s.notes.map((n, k) => (
+          <div key={k} style={{ display: 'contents' }}>
+            <div className="me">{n}</div>
+            <div className="ai-card" style={{ width: 'min(320px, 100%)' }}>
+              <span className="badge badge--success"><Icon name="check" size={14} width={2.6} />Tercatat</span>
+              <p>Pesanan dari warung sudah aku catat dan masuk ke daftar hari ini. Pembayarannya tetap kamu yang terima.</p>
+            </div>
+          </div>
+        ))}
+        {stock && (
+          <div className="ai-card" style={{ width: 'min(320px, 100%)' }}>
+            <p><b>Stok hari ini:</b> gula aren tinggal 3 bungkus. Barang lain masih cukup untuk hari ini.</p>
+          </div>
+        )}
+        {s.compose && (
+          <form className="ai-card" onSubmit={(e) => { e.preventDefault(); if (orderText.trim()) { dispatch({ type: 'addNote', text: orderText.trim() }); setOrderText(''); } }}>
+            {s.compose === 'bicara' ? (
+              <>
+                <p>Ucapkan pesanannya, aku yang tulis.</p>
+                <div className="info">Di prototipe ini suara belum diproses. Tekan “Selesai bicara” untuk mengisi contoh hasilnya.</div>
+                <button type="button" className="btn btn--primary btn--block" onClick={() => { setOrderText(SAMPLE); dispatch({ type: 'compose', mode: 'ketik' }); }}>
+                  <Icon name="mic" stroke="#fff" />Selesai bicara
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="field">
+                  <label htmlFor="pesanan-warung">Pesanan pembeli yang datang ke warung</label>
+                  <textarea id="pesanan-warung" rows={3} value={orderText} placeholder="Contoh: 2 es teh manis, 1 pisang goreng" onChange={(e) => setOrderText(e.target.value)} />
+                </div>
+                <button type="submit" className="btn btn--dark btn--block" disabled={!orderText.trim()}>Catat pesanan</button>
+              </>
+            )}
+            <button type="button" className="btn btn--ghost" style={{ alignSelf: 'flex-start' }} onClick={() => { setOrderText(''); dispatch({ type: 'closeCompose' }); }}>Batal</button>
+          </form>
+        )}
+      </div>
+      <div className="chips" role="group" aria-label="Tombol cepat">
+        <button type="button" className="btn btn--outline" onClick={() => dispatch({ type: 'compose', mode: 'ketik' })}>Catat pesanan</button>
+        <button type="button" className="btn btn--outline" aria-pressed={stock} onClick={() => setStock(true)}>Cek stok</button>
+        <button type="button" className="btn btn--outline" onClick={() => dispatch({ type: 'screen', screen: 'laporan' })}>Rekap hari ini</button>
       </div>
     </>
   );
@@ -376,7 +436,7 @@ export default function Prototipe() {
     <>
       <div className="page-head">
         <h1>Dari chat pembeli sampai laporan</h1>
-        <p>Rina memesan di WhatsApp, Asisten AI membalas dan mencatat, Bu Sari yang menagih dan mengecek uang masuk. Ikuti petunjuk, tombol yang perlu ditekan diberi lingkaran oranye.</p>
+        <p>Rina memesan di WhatsApp, Asisten Pintar membalas dan mencatat, Bu Sari yang menagih dan mengecek uang masuk. Ikuti petunjuk, tombol yang perlu ditekan diberi lingkaran oranye.</p>
       </div>
 
       <div className="guide" role="status" aria-live="polite">

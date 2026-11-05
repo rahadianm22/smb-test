@@ -2,7 +2,7 @@ import Icon from '../components/Icon.jsx';
 
 const STEPS = [
   { role: 'pembeli', who: 'Pembeli', text: 'Kirim pesanan lewat WhatsApp', where: ['chat', 'di WhatsApp'] },
-  { role: 'ai', who: 'Asisten AI', text: 'Balas chat dan catat pesanan otomatis', where: ['chat', 'di WhatsApp'] },
+  { role: 'ai', who: 'Asisten Pintar', text: 'Balas chat dan catat pesanan otomatis', where: ['chat', 'di WhatsApp'] },
   { role: 'kamu', who: 'Kamu', text: 'Cek pesanan, kirim total ke pembeli', where: ['phone', 'aplikasi Sejati → WA'] },
   { role: 'pembeli', who: 'Pembeli', text: 'Bayar lewat transfer atau QRIS', where: ['bank', 'bank / QRIS'] },
   { role: 'kamu', who: 'Kamu', text: 'Cek: uang sudah masuk ke rekening?', where: ['bank', 'aplikasi bank'] }
@@ -40,7 +40,7 @@ export default function Alur() {
 
       <div className="rule">
         <Icon name="shield" size={32} stroke="var(--blue-800)" />
-        <p><b>Aturan penting:</b> Asisten AI hanya membalas chat dan mencatat pesanan. <b>Menagih dan memastikan uang sudah masuk selalu kamu sendiri</b>, supaya tidak ada pesanan dianggap lunas padahal belum.</p>
+        <p><b>Aturan penting:</b> Asisten Pintar hanya membalas chat dan mencatat pesanan. <b>Menagih dan memastikan uang sudah masuk selalu kamu sendiri</b>, supaya tidak ada pesanan dianggap lunas padahal belum.</p>
       </div>
     </>
   );

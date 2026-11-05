@@ -87,7 +87,7 @@ export default function Percakapan() {
     <>
       <div className="page-head">
         <h1>Percakapan pembeli di WhatsApp</h1>
-        <p>Sembilan potongan chat dari sisi pembeli. Asisten AI membalas dan mencatat, tapi tidak pernah menagih atau mengonfirmasi pembayaran. Itu selalu dilakukan Bu Sari.</p>
+        <p>Sembilan potongan chat dari sisi pembeli. Asisten Pintar membalas dan mencatat, tapi tidak pernah menagih atau mengonfirmasi pembayaran. Itu selalu dilakukan Bu Sari.</p>
       </div>
 
       <div className="scenes">
@@ -109,12 +109,12 @@ export default function Percakapan() {
       </div>
 
       <section className="compare" aria-labelledby="banding">
-        <h2 id="banding">Dibanding contoh bot WhatsApp</h2>
+        <h2 id="banding">Yang saya pertahankan dan yang saya sesuaikan</h2>
         <table className="table">
-          <thead><tr><th scope="col">Di contoh bot</th><th scope="col">Di usulan ini</th></tr></thead>
+          <thead><tr><th scope="col">Di alur yang ada</th><th scope="col">Di usulan ini</th></tr></thead>
           <tbody>
             {COMPARE.map(([a, b]) => (
-              <tr key={a}><td data-label="Di contoh bot">{a}</td><td data-label="Di usulan ini">{b}</td></tr>
+              <tr key={a}><td data-label="Di alur yang ada">{a}</td><td data-label="Di usulan ini">{b}</td></tr>
             ))}
           </tbody>
         </table>

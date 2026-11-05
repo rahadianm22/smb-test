@@ -13,7 +13,7 @@ export const MENU = {
 export const SCENES = [
   {
     id: 'wa1', title: '1 · Sapa & menu',
-    note: 'Minimal pesan dan barang habis terlihat dari awal, bukan setelah checkout.',
+    note: 'Minimal pesan dan barang yang habis sudah terlihat di menu.',
     msgs: [
       { type: 'date', text: 'Hari ini' },
       { type: 'out', text: 'Halo kak, mau pesan', time: '11.02' },
@@ -24,7 +24,7 @@ export const SCENES = [
   },
   {
     id: 'wa2', title: '2 · Pesan pakai bahasa sendiri',
-    note: 'AI hanya menulis perkiraan total. Angka pastinya dikirim Bu Sari.',
+    note: 'Asisten hanya menulis perkiraan total. Angka pastinya dikirim Bu Sari.',
     msgs: [
       { type: 'out', text: '2 kopi susu gula aren sama roti bakar 1 ya kak. Kopinya kurang manis', time: '11.03' },
       {
@@ -50,7 +50,7 @@ export const SCENES = [
   },
   {
     id: 'wa4', title: '4 · Ambil atau diantar',
-    note: 'Tombol balasan menggantikan perintah “pickup” dan “checkout”.',
+    note: 'Pembeli memilih lewat tombol balasan, tanpa mengetik perintah.',
     msgs: [
       { type: 'out', text: 'Sudah, itu saja', time: '11.06' },
       { type: 'in', who: 'ai', time: '11.06', text: 'Mau diambil di warung atau diantar?', replies: ['Ambil di warung', 'Diantar ke alamatku'] },
@@ -62,15 +62,15 @@ export const SCENES = [
   },
   {
     id: 'wa5', title: '5 · Total & cara bayar dari Bu Sari',
-    note: 'Penagihan datang dari pemilik, bukan dari AI.',
+    note: 'Penagihan datang dari pemilik.',
     msgs: [
       { type: 'in', who: 'owner', time: '11.09', text: 'Halo Kak Dimas, totalnya Rp 72.000 ya.\nBayar ke Bank ABC 123 456 7890 a.n. Sari Wulandari, atau scan QRIS di bawah.', qris: true },
       { type: 'out', text: 'Oke kak, aku transfer dulu', time: '11.10' }
     ]
   },
   {
-    id: 'wa6', title: '6 · Kirim bukti, AI tidak konfirmasi',
-    note: 'AI meneruskan bukti ke Bu Sari dan jujur bahwa ia tidak bisa melihat rekening.',
+    id: 'wa6', title: '6 · Kirim bukti, Asisten tidak konfirmasi',
+    note: 'Asisten meneruskan bukti ke Bu Sari dan jujur bahwa ia tidak bisa melihat rekening.',
     msgs: [
       { type: 'out', image: true, text: 'Sudah transfer ya kak', time: '11.12' },
       { type: 'in', who: 'ai', time: '11.12', text: 'Terima kasih, Kak! Buktinya sudah aku teruskan ke Bu Sari. Bu Sari cek dulu di rekeningnya, nanti dikabari di chat ini, ya.' },
@@ -80,7 +80,7 @@ export const SCENES = [
   },
   {
     id: 'wa7', title: '7 · Dikonfirmasi Bu Sari & status',
-    note: 'Status mengikuti pilihan ambil di warung, bukan “dalam perjalanan”.',
+    note: 'Status mengikuti pilihan ambil di warung: “sudah siap, ambil di kasir”.',
     msgs: [
       { type: 'in', who: 'owner', time: '11.24', text: 'Pembayaran Rp 72.000 sudah kami terima. Terima kasih, Kak Dimas! Pesananmu langsung kami buat.' },
       { type: 'in', who: 'ai', time: '11.25', text: 'Pesanan #21 sedang dibuat.' },
@@ -90,7 +90,7 @@ export const SCENES = [
   },
   {
     id: 'wa8', title: '8 · Pertanyaan & keluhan',
-    note: 'AI bilang kenapa chat disambungkan ke Bu Sari.',
+    note: 'Asisten bilang kenapa chat disambungkan ke Bu Sari.',
     msgs: [
       { type: 'out', text: 'Kak, bisa minta sedotan kertas? Terus kemarin kopinya kemanisan', time: '11.08' },
       { type: 'in', who: 'ai', time: '11.08', text: 'Bisa, sedotan kertas sudah aku catat di pesanan #21.\n\nSoal kopi kemarin, aku sambungkan ke Bu Sari supaya dibantu langsung. Nanti beliau balas di chat ini, ya.' },
@@ -99,8 +99,8 @@ export const SCENES = [
     ]
   },
   {
-    id: 'wa9', title: '9 · Saat AI belum paham',
-    note: 'AI menebak dengan sopan, lalu meneruskan yang tidak bisa ia proses.',
+    id: 'wa9', title: '9 · Saat Asisten belum paham',
+    note: 'Asisten menebak dengan sopan, lalu meneruskan yang tidak bisa ia proses.',
     msgs: [
       { type: 'out', text: 'Yang kayak kemarin aja kak', time: '08.15' },
       { type: 'in', who: 'ai', time: '08.15', text: 'Aku cek dulu, ya. Kemarin kamu pesan 3 Kopi susu gula aren (kurang manis) dan 1 Roti bakar cokelat. Mau pesan yang sama?', replies: ['Ya, sama seperti kemarin', 'Bukan, lihat menu'] },
@@ -111,14 +111,14 @@ export const SCENES = [
 ];
 
 export const COMPARE = [
-  ['Bot mengirim QRIS dan bilang “pembayaran akan terkonfirmasi otomatis”.', 'Total dan cara bayar dikirim Bu Sari dari aplikasi. AI hanya bilang totalnya akan menyusul.'],
-  ['Bot membalas “pembayaran sudah kami terima” sendiri.', 'Hanya Bu Sari yang mengonfirmasi, setelah cek rekening.'],
-  ['Perintah kaku: checkout, hapus 2, kosongkan, pickup, delivery.', 'Tombol balasan berbahasa sehari-hari: “Sudah, itu saja”, “Ambil di warung”.'],
-  ['“Ubah dirty latte jadi 10” tidak dimengerti.', 'Pembeli cukup bilang “kopinya jadi 3 deh”.'],
+  ['Bot mengirim QRIS dan menyebut pembayaran akan terkonfirmasi otomatis.', 'Total dan cara bayar dikirim Bu Sari dari aplikasi. Asisten hanya bilang totalnya akan menyusul.'],
+  ['Konfirmasi “pembayaran sudah kami terima” dikirim oleh bot.', 'Hanya Bu Sari yang mengonfirmasi, setelah cek rekening.'],
+  ['Pembeli mengetik perintah: checkout, hapus 2, kosongkan, pickup, delivery.', 'Tombol balasan berbahasa sehari-hari: “Sudah, itu saja”, “Ambil di warung”.'],
+  ['Mengubah jumlah memakai format tertentu, misalnya “dirty latte ubah 1 jadi 10”.', 'Pembeli cukup bilang “kopinya jadi 3 deh”.'],
   ['Minimal pembelian baru muncul setelah checkout.', 'Minimal pesan ditulis di menu sejak awal.'],
-  ['Stok “perlu dikonfirmasi” dengan harga membingungkan.', 'Label “Habis hari ini”, lalu AI menawarkan pengganti.'],
-  ['Diambil di toko, tapi status “sedang dalam perjalanan”.', 'Status mengikuti pilihan: “sudah siap, ambil di kasir”.'],
+  ['Stok “perlu dikonfirmasi” tampil bersama harga.', 'Label “Habis hari ini”, lalu Asisten menawarkan pengganti.'],
+  ['Pesanan diambil di toko juga menerima status “sedang dalam perjalanan”.', 'Status mengikuti pilihan: “sudah siap, ambil di kasir”.'],
   ['Nomor pesanan “ORD-6309cc5d”, sapaan “Anda”.', '“Pesanan #21”, sapaan “Kak” dan “kamu”.'],
-  ['Tiba-tiba “saya sambungkan ke admin” tanpa alasan.', 'AI bilang kenapa, dan Bu Sari membalas di chat yang sama.'],
-  ['Pembeli tidak tahu sedang bicara dengan bot atau orang.', 'Setiap pesan diberi tanda pengirim: Asisten Pintar atau Bu Sari.']
+  ['“Saya sambungkan ke admin” muncul tanpa keterangan kenapa.', 'Asisten bilang kenapa, dan Bu Sari membalas di chat yang sama.'],
+  ['Pesan dari bot dan dari admin terlihat sama.', 'Setiap pesan diberi tanda pengirim: Asisten Pintar atau Bu Sari.']
 ];
